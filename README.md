@@ -11,18 +11,24 @@ Link for MOT20: https://motchallenge.net/data/MOT20.zip
 
 ```
 - code
-  - 1. train_feat_ext
-  - 2. online_MTMC
+  - frost_images
+  - generate_corruption_dataset.py
+  - temporal_feature_mix.py
 
 - dataset
   - MOT-C
     - train
+      - MOT17-02-FRCNN
+      - MOT17-10-FRCNN
+      - MOT17-11-FRCNN
+      - MOT17-13-FRCNN
+      - MOT20-02
+      - MOT20-05
     - test
       - MOT17-04-FRCNN
       - MOT17-05-FRCNN
       - MOT17-09-FRCNN
       - MOT20-01
       - MOT20-03
-'''
 
 ## Usage
