@@ -30,6 +30,6 @@ Link for MOT20: https://motchallenge.net/data/MOT20.zip
       - MOT17-09-FRCNN
       - MOT20-01
       - MOT20-03
-
+```
 
 ## Usage
