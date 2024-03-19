@@ -32,4 +32,11 @@ Link for MOT20: https://motchallenge.net/data/MOT20.zip
       - MOT20-03
 ```
 
-## Usage
+## Usage ()
+```
+# To generating corruption dataset
+python generate_corruption_dataset.py
+```
+
+```
+```
