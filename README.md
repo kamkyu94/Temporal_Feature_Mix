@@ -32,11 +32,40 @@ Link for MOT20: https://motchallenge.net/data/MOT20.zip
       - MOT20-03
 ```
 
-## Usage ()
+## Usage
 ```
 # To generating corruption dataset
 python generate_corruption_dataset.py
 ```
 
 ```
+# To apply temporal feature mix (Example code)
+
+# Define model and loss
+model = Model()
+model = FeatureMix(model, batch_size // device_num,  tfm_p, tfm_r_max)
+loss = Loss()
+
+# Get two randomly adjacent frames and labels for frame_1
+frame_1, frame_2, labels = sample_adjacent_frames_labels()
+
+# Save features to be mixed
+model.eval()
+with torch.no_grad():
+    model.start_feature_record()
+    _ = model(frame_2, targets)
+    model.end_feature_record()
+model.train()
+
+# Inference and mixing the features
+model.start_feature_mix()
+outputs = model(frame_1)
+model.end_feature_mix()
+
+# Get loss and back-propagation
+total_loss = loss(outputs, labels)
+optimizer.zero_grad()
+total_loss.backward()
+optimizer.step()
+
 ```
