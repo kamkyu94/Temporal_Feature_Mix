@@ -12,8 +12,8 @@ Link for MOT20: https://motchallenge.net/data/MOT20.zip
 ```
 - code
   - frost_images
+  - feature_mix.py
   - generate_corruption_dataset.py
-  - temporal_feature_mix.py
 
 - dataset
   - MOT-C
