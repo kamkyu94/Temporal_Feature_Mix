@@ -34,8 +34,8 @@ Link for MOT20: https://motchallenge.net/data/MOT20.zip
 
 ## Usage (Example codes)
 ### Set temporal feature mix in the model
-```
-***# Define temporal feature mix***
+```python
+# Define temporal feature mix
 class TFM(nn.Module):
     @staticmethod
     def forward(x):
@@ -58,7 +58,7 @@ class BaseConv(nn.Module):
 ```
 
 ### Train the model with temporal feature mix
-```
+```python
 # Define model and loss
 model = Model()
 model = FeatureMix(model, batch_size // device_num,  tfm_p, tfm_r_max)
