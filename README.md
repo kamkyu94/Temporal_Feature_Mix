@@ -46,15 +46,21 @@ class TFM(nn.Module):
 class BaseConv(nn.Module):
     def __init__(self, in_channels, out_channels, ksize, stride, groups=1, bias=False, act="silu", tfm=False):
         super().__init__()
+        # Define a convolution layer
         pad = (ksize - 1) // 2
         self.conv = nn.Conv2d(in_channels, out_channels, kernel_size=ksize, stride=stride,
                               padding=pad, groups=groups, bias=bias,)
+
+        # Define others
         self.tfm = TFM() if tfm else None
         self.bn = nn.BatchNorm2d(out_channels)
         self.act = get_activation(act, inplace=True)
 
     def forward(self, x):
-        return self.act(self.bn(self.tfm(self.conv(x)))) if self.tfm is not None else self.act(self.bn(self.conv(x)))
+        if self.tfm is not None:
+            return self.act(self.bn(self.tfm(self.conv(x))))
+        else:
+            self.act(self.bn(self.conv(x)))
 ```
 
 ### 2. Train the model with temporal feature mix
@@ -65,27 +71,27 @@ model = FeatureMix(model, batch_size // device_num,  tfm_p, tfm_r_max)
 loss = Loss()
 
 for idx in range(data_len):
-  # Get two randomly adjacent frames and labels for frame_1
-  frame_1, frame_2, labels = sample_adjacent_frames_labels(idx)
-  
-  # Save features to be mixed
-  model.eval()
-  with torch.no_grad():
-      model.start_feature_record()
-      _ = model(frame_2, targets)
-      model.end_feature_record()
-  model.train()
-  
-  # Inference and mixing the features
-  model.start_feature_mix()
-  outputs = model(frame_1)
-  model.end_feature_mix()
-  
-  # Get loss and back-propagation
-  total_loss = loss(outputs, labels)
-  optimizer.zero_grad()
-  total_loss.backward()
-  optimizer.step()
+    # Get two randomly adjacent frames and labels for frame_1
+    frame_1, frame_2, labels = sample_adjacent_frames_labels(idx)
+    
+    # Save features to be mixed
+    model.eval()
+    with torch.no_grad():
+        model.start_feature_record()
+        _ = model(frame_2, targets)
+        model.end_feature_record()
+    model.train()
+    
+    # Inference and mixing the features
+    model.start_feature_mix()
+    outputs = model(frame_1)
+    model.end_feature_mix()
+    
+    # Get loss and back-propagation
+    total_loss = loss(outputs, labels)
+    optimizer.zero_grad()
+    total_loss.backward()
+    optimizer.step()
 
 # Remove temporal feautre mix after finishing all training
 model.remove_hooks()
