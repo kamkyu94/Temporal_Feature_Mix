@@ -32,7 +32,7 @@ Link for MOT20: https://motchallenge.net/data/MOT20.zip
       - MOT20-03
 ```
 
-## Usage (Example code)
+## Usage (Example codes)
 ### Set temporal feature mix in the model
 ```
 # Define temporal feature mix
