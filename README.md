@@ -32,40 +32,62 @@ Link for MOT20: https://motchallenge.net/data/MOT20.zip
       - MOT20-03
 ```
 
-## Usage
+## Usage (Example code)
+### Set temporal feature mix in the model
 ```
-# To generating corruption dataset
-python generate_corruption_dataset.py
+# Define temporal feature mix
+class TFM(nn.Module):
+    @staticmethod
+    def forward(x):
+        return x
+
+# Apply temporal feature mix in every layer of the model
+# For example add temporal feature mix in the basic convolution module of the model
+class BaseConv(nn.Module):
+    def __init__(self, in_channels, out_channels, ksize, stride, groups=1, bias=False, act="silu", tfm=False):
+        super().__init__()
+        pad = (ksize - 1) // 2
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size=ksize, stride=stride,
+                              padding=pad, groups=groups, bias=bias,)
+        self.tfm = TFM() if tfm else None
+        self.bn = nn.BatchNorm2d(out_channels)
+        self.act = get_activation(act, inplace=True)
+
+    def forward(self, x):
+        return self.act(self.bn(self.tfm(self.conv(x)))) if self.tfm is not None else self.act(self.bn(self.conv(x)))
 ```
 
+### Train the model with temporal feature mix
 ```
-# To apply temporal feature mix (Example code)
-
 # Define model and loss
 model = Model()
 model = FeatureMix(model, batch_size // device_num,  tfm_p, tfm_r_max)
 loss = Loss()
 
-# Get two randomly adjacent frames and labels for frame_1
-frame_1, frame_2, labels = sample_adjacent_frames_labels()
+for idx in range(data_len):
+  # Get two randomly adjacent frames and labels for frame_1
+  frame_1, frame_2, labels = sample_adjacent_frames_labels(idx)
+  
+  # Save features to be mixed
+  model.eval()
+  with torch.no_grad():
+      model.start_feature_record()
+      _ = model(frame_2, targets)
+      model.end_feature_record()
+  model.train()
+  
+  # Inference and mixing the features
+  model.start_feature_mix()
+  outputs = model(frame_1)
+  model.end_feature_mix()
+  
+  # Get loss and back-propagation
+  total_loss = loss(outputs, labels)
+  optimizer.zero_grad()
+  total_loss.backward()
+  optimizer.step()
 
-# Save features to be mixed
-model.eval()
-with torch.no_grad():
-    model.start_feature_record()
-    _ = model(frame_2, targets)
-    model.end_feature_record()
-model.train()
-
-# Inference and mixing the features
-model.start_feature_mix()
-outputs = model(frame_1)
-model.end_feature_mix()
-
-# Get loss and back-propagation
-total_loss = loss(outputs, labels)
-optimizer.zero_grad()
-total_loss.backward()
-optimizer.step()
-
+# Remove temporal feautre mix after finishing all training
+model.remove_hooks()
+model = model.model
 ```
