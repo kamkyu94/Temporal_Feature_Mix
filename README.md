@@ -1,5 +1,6 @@
 # Temporal Feature Mix
 Official code for "Enhancing Robustness of Multi-Object Trackers with Temporal Feature Mix"
+  - https://ieeexplore.ieee.org/document/10535304
 
 ## Environment
 Developed in python3.8, pytorch 1.11
