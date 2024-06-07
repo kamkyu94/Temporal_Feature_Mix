@@ -1,5 +1,5 @@
 # Temporal Feature Mix
-Official code for "Enhancing Robustness of Multi-Object Trackers with Temporal Feature Mix"
+Official code for "Enhancing Robustness of Multi-Object Trackers with Temporal Feature Mix", TCSVT, 2024
   - https://ieeexplore.ieee.org/document/10535304
 
 ## Environment
